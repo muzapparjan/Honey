@@ -52,13 +52,28 @@ namespace Honey.Core
 
             /* and/or/not识别 */
 
-            NFA.State state_and_0 = new NFA.State("and_a", -1);
-            NFA.State state_and_1 = new NFA.State("and_n", -1);
+            NFA.State state_and_a = new NFA.State("and_a", -1);
+            NFA.State state_and_A = new NFA.State("and_A", -1);
+            NFA.State state_and_n = new NFA.State("and_n", -1);
+            NFA.State state_and_N = new NFA.State("and_N", -1);
             NFA.State state_and = new NFA.State("and", 50);
 
-            state_Start.transitions.Add(NFA.TransitionFactory.EqualTo("a", state_and_0));
-            state_and_0.transitions.Add(NFA.TransitionFactory.EqualTo("n", state_and_1));
-            state_and_1.transitions.Add(NFA.TransitionFactory.EqualTo("d", state_and));
+            state_Start.transitions.Add(NFA.TransitionFactory.EqualTo("a", state_and_a));
+            state_Start.transitions.Add(NFA.TransitionFactory.EqualTo("A", state_and_A));
+            state_and_a.transitions.Add(NFA.TransitionFactory.EqualTo("n", state_and_n));
+            state_and_A.transitions.Add(NFA.TransitionFactory.EqualTo("n", state_and_n));
+            state_and_A.transitions.Add(NFA.TransitionFactory.EqualTo("N", state_and_N));
+            state_and_n.transitions.Add(NFA.TransitionFactory.EqualTo("d", state_and));
+            state_and_N.transitions.Add(NFA.TransitionFactory.EqualTo("D", state_and));
+
+            NFA.State state_or_o = new NFA.State("or_o", -1);
+            NFA.State state_or_O = new NFA.State("or_O", -1);
+            NFA.State state_or = new NFA.State("or", 50);
+
+            state_Start.transitions.Add(NFA.TransitionFactory.EqualTo("o", state_or_o));
+            state_Start.transitions.Add(NFA.TransitionFactory.EqualTo("O", state_or_O));
+            state_or_o.transitions.Add(NFA.TransitionFactory.EqualTo("r", state_or));
+            state_or_O.transitions.Add(NFA.TransitionFactory.ElementOf(state_or, "r", "R"));
 
             /****************************************************/
 

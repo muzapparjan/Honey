@@ -2,7 +2,7 @@
  * HUST-CS1801-Muzappar
  * 2020-12-07
  * ----------------------------------------------------------------------------------------------------
- * Agreement Block / 协议区
+ * Terms of use / 使用条款
  * 
  * 1.You can do any legal things you want with this software.
  * 1.你可以用这个软件做任何合法的事情。
@@ -198,6 +198,16 @@ namespace Honey.Core
                 }, targetState);
             }
             public static Transition ElementOf(List<string> paramList, State targetState)
+            {
+                return new Transition((string input) =>
+                {
+                    foreach (string param in paramList)
+                        if (input == param)
+                            return true;
+                    return false;
+                }, targetState);
+            }
+            public static Transition ElementOf(State targetState, params string[] paramList)
             {
                 return new Transition((string input) =>
                 {
