@@ -2,4 +2,8 @@
 # 此 .gitignore 文件已由 Microsoft(R) Visual Studio 自动创建。
 ################################################################################
 
-*.v2
+/.vs
+/Honey.Core/bin
+/Honey.Core/obj
+/Honey.Test/bin
+/Honey.Test/obj
