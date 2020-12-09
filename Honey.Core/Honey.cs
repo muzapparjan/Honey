@@ -77,9 +77,6 @@ namespace Honey.Core
 
             /****************************************************/
 
-
-
-
             return new NFA(state_Start);
         }
     }
