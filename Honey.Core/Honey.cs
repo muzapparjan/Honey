@@ -163,8 +163,13 @@ namespace Honey.Core
             {   "yield"         ,   50  }
         };
 
+        private static NFA.State state_Start = null;
+
         public static NFA CreateNFA()
         {
+            if (Honey.state_Start != null)
+                return new NFA(Honey.state_Start);
+
             NFA.State state_Start = new NFA.State("Start");
             NFA.State state_End = new NFA.State("End");
 
@@ -236,8 +241,7 @@ namespace Honey.Core
             foreach (KeyValuePair<string, int> keyword in keywords)
                 AddKeywordToNFA(state_Start, keyword.Key, keyword.Value);
 
-            /****************************************************/
-
+            Honey.state_Start = state_Start;
             return new NFA(state_Start);
         }
         private static void AddKeywordToNFA(NFA.State state_Start, string keyword, int priority = 50)
