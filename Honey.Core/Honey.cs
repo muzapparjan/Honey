@@ -24,6 +24,28 @@ namespace Honey.Core
         private static readonly List<string> characterSet_Identifier = CharacterSet.Combine(CharacterSet.NumbersAndLetters(), "_", "@", "#", "$");
         private static readonly List<string> characterSet_HexNumber = CharacterSet.Combine(CharacterSet.Numbers(), "a", "A", "b", "B", "c", "C", "d", "D", "e", "E", "f", "F");
 
+        private static readonly Dictionary<string, int> keywords = new Dictionary<string, int>()
+        {
+            {   "and"       ,   50  },
+            {   "as"        ,   50  },
+            {   "case"      ,   50  },
+            {   "default"   ,   50  },
+            {   "elif"      ,   50  },
+            {   "else"      ,   50  },
+            {   "equal"     ,   50  },
+            {   "equals"    ,   50  },
+            {   "if"        ,   50  },
+            {   "import"    ,   50  },
+            {   "include"   ,   50  },
+            {   "is"        ,   50  },
+            {   "let"       ,   50  },
+            {   "not"       ,   50  },
+            {   "or"        ,   50  },
+            {   "switch"    ,   50  },
+            {   "using"     ,   50  },
+            {   "var"       ,   50  }
+        };
+
         public static NFA CreateNFA()
         {
             NFA.State state_Start = new NFA.State("Start");
@@ -89,48 +111,59 @@ namespace Honey.Core
             state_Start.transitions.Add(NFA.TransitionFactory.ElementOf(characterSet_Identifier, state_Identifier));
             state_Identifier.transitions.Add(NFA.TransitionFactory.ElementOf(characterSet_Identifier, state_Identifier));
 
-            /* and/or/not识别 */
+            /* 关键字识别 */
 
-            NFA.State state_and_a = new NFA.State("and_a", -1);
-            NFA.State state_and_A = new NFA.State("and_A", -1);
-            NFA.State state_and_n = new NFA.State("and_n", -1);
-            NFA.State state_and_N = new NFA.State("and_N", -1);
-            NFA.State state_and = new NFA.State("and", 50);
-
-            state_Start.transitions.Add(NFA.TransitionFactory.EqualTo("a", state_and_a));
-            state_Start.transitions.Add(NFA.TransitionFactory.EqualTo("A", state_and_A));
-            state_and_a.transitions.Add(NFA.TransitionFactory.EqualTo("n", state_and_n));
-            state_and_A.transitions.Add(NFA.TransitionFactory.EqualTo("n", state_and_n));
-            state_and_A.transitions.Add(NFA.TransitionFactory.EqualTo("N", state_and_N));
-            state_and_n.transitions.Add(NFA.TransitionFactory.EqualTo("d", state_and));
-            state_and_N.transitions.Add(NFA.TransitionFactory.EqualTo("D", state_and));
-
-            NFA.State state_or_o = new NFA.State("or_o", -1);
-            NFA.State state_or_O = new NFA.State("or_O", -1);
-            NFA.State state_or = new NFA.State("or", 50);
-
-            state_Start.transitions.Add(NFA.TransitionFactory.EqualTo("o", state_or_o));
-            state_Start.transitions.Add(NFA.TransitionFactory.EqualTo("O", state_or_O));
-            state_or_o.transitions.Add(NFA.TransitionFactory.EqualTo("r", state_or));
-            state_or_O.transitions.Add(NFA.TransitionFactory.ElementOf(state_or, "r", "R"));
-
-            NFA.State state_not_n = new NFA.State("not_n", -1);
-            NFA.State state_not_N = new NFA.State("not_N", -1);
-            NFA.State state_not_o = new NFA.State("not_o", -1);
-            NFA.State state_not_O = new NFA.State("not_O", -1);
-            NFA.State state_not = new NFA.State("not", 50);
-
-            state_Start.transitions.Add(NFA.TransitionFactory.EqualTo("n", state_not_n));
-            state_Start.transitions.Add(NFA.TransitionFactory.EqualTo("N", state_not_N));
-            state_not_n.transitions.Add(NFA.TransitionFactory.EqualTo("o", state_not_o));
-            state_not_N.transitions.Add(NFA.TransitionFactory.EqualTo("o", state_not_o));
-            state_not_N.transitions.Add(NFA.TransitionFactory.EqualTo("O", state_not_O));
-            state_not_o.transitions.Add(NFA.TransitionFactory.EqualTo("t", state_not));
-            state_not_O.transitions.Add(NFA.TransitionFactory.EqualTo("T", state_not));
+            foreach (KeyValuePair<string, int> keyword in keywords)
+                AddKeywordToNFA(state_Start, keyword.Key, keyword.Value);
 
             /****************************************************/
 
             return new NFA(state_Start);
+        }
+        private static void AddKeywordToNFA(NFA.State state_Start, string keyword, int priority = 50)
+        {
+            string lowerKeyword = keyword.ToLower();
+            string upperKeyword = keyword.ToUpper();
+            string firstChar_Lower = lowerKeyword[0].ToString();
+            string firstChar_Upper = upperKeyword[0].ToString();
+
+            NFA.State state_Keyword = new NFA.State(lowerKeyword, priority);
+
+            NFA.State state_FirstChar_Lower = new NFA.State(lowerKeyword + "_" + firstChar_Lower, -1);
+            NFA.State state_FirstChar_Upper = new NFA.State(lowerKeyword + "_" + firstChar_Upper, -1);
+
+            state_Start.transitions.Add(NFA.TransitionFactory.EqualTo(firstChar_Lower, state_FirstChar_Lower));
+            state_Start.transitions.Add(NFA.TransitionFactory.EqualTo(firstChar_Upper, state_FirstChar_Upper));
+
+            if (keyword.Length == 2)
+            {
+                state_FirstChar_Lower.transitions.Add(NFA.TransitionFactory.EqualTo(lowerKeyword[1].ToString(), state_Keyword));
+                state_FirstChar_Upper.transitions.Add(NFA.TransitionFactory.ElementOf(state_Keyword, lowerKeyword[1].ToString(), upperKeyword[1].ToString()));
+                return;
+            }
+
+            NFA.State state_SecondChar_Lower = new NFA.State(lowerKeyword + "_" + lowerKeyword[1], -1);
+
+            state_FirstChar_Lower.transitions.Add(NFA.TransitionFactory.EqualTo(lowerKeyword[1].ToString(), state_SecondChar_Lower));
+            state_FirstChar_Upper.transitions.Add(NFA.TransitionFactory.EqualTo(lowerKeyword[1].ToString(), state_SecondChar_Lower));
+
+            NFA.State lastState = state_SecondChar_Lower;
+            for (int i = 2; i < lowerKeyword.Length - 1; i++)
+            {
+                NFA.State nextState = new NFA.State(lowerKeyword + "_" + lowerKeyword[i], -1);
+                lastState.transitions.Add(NFA.TransitionFactory.EqualTo(lowerKeyword[i].ToString(), nextState));
+                lastState = nextState;
+            }
+            lastState.transitions.Add(NFA.TransitionFactory.EqualTo(lowerKeyword[lowerKeyword.Length - 1].ToString(), state_Keyword));
+
+            lastState = state_FirstChar_Upper;
+            for (int i = 1; i < upperKeyword.Length - 1; i++)
+            {
+                NFA.State nextState = new NFA.State(lowerKeyword + "_" + upperKeyword[i], -1);
+                lastState.transitions.Add(NFA.TransitionFactory.EqualTo(upperKeyword[i].ToString(), nextState));
+                lastState = nextState;
+            }
+            lastState.transitions.Add(NFA.TransitionFactory.EqualTo(upperKeyword[upperKeyword.Length - 1].ToString(), state_Keyword));
         }
     }
 }
