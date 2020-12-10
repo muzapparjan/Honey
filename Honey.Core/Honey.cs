@@ -241,6 +241,127 @@ namespace Honey.Core
             foreach (KeyValuePair<string, int> keyword in keywords)
                 AddKeywordToNFA(state_Start, keyword.Key, keyword.Value);
 
+            /* 运算符识别 */
+
+            NFA.State state_Op_Equal = new NFA.State("=", 10);
+            NFA.State state_Op_EqualTo = new NFA.State("==", 10);
+
+            state_Start.transitions.Add(NFA.TransitionFactory.EqualTo("=", state_Op_Equal));
+            state_Op_Equal.transitions.Add(NFA.TransitionFactory.EqualTo("=", state_Op_EqualTo));
+
+            NFA.State state_Op_Greater = new NFA.State(">", 10);
+            NFA.State state_Op_GreaterEqual = new NFA.State(">=", 10);
+
+            state_Start.transitions.Add(NFA.TransitionFactory.EqualTo(">", state_Op_Greater));
+            state_Op_Greater.transitions.Add(NFA.TransitionFactory.EqualTo("=", state_Op_GreaterEqual));
+
+            NFA.State state_Op_Less = new NFA.State("<", 10);
+            NFA.State state_Op_LessEqual = new NFA.State("<=", 10);
+
+            state_Start.transitions.Add(NFA.TransitionFactory.EqualTo("<", state_Op_Less));
+            state_Op_Less.transitions.Add(NFA.TransitionFactory.EqualTo("=", state_Op_LessEqual));
+
+            NFA.State state_Op_Input = new NFA.State(">>", 10);
+            NFA.State state_Op_Output = new NFA.State("<<", 10);
+
+            state_Op_Greater.transitions.Add(NFA.TransitionFactory.EqualTo(">", state_Op_Input));
+            state_Op_Less.transitions.Add(NFA.TransitionFactory.EqualTo("<", state_Op_Output));
+
+            NFA.State state_Op_BitAnd = new NFA.State("&", 10);
+            NFA.State state_Op_And = new NFA.State("&&", 10);
+
+            state_Start.transitions.Add(NFA.TransitionFactory.EqualTo("&", state_Op_BitAnd));
+            state_Op_BitAnd.transitions.Add(NFA.TransitionFactory.EqualTo("&", state_Op_And));
+
+            NFA.State state_Op_BitOr = new NFA.State("|", 10);
+            NFA.State state_Op_Or = new NFA.State("||", 10);
+
+            state_Start.transitions.Add(NFA.TransitionFactory.EqualTo("|", state_Op_BitOr));
+            state_Op_BitOr.transitions.Add(NFA.TransitionFactory.EqualTo("|", state_Op_Or));
+
+            NFA.State state_Op_Not = new NFA.State("!", 10);
+            NFA.State state_Op_BitNot = new NFA.State("~", 10);
+            NFA.State state_Op_BitXor = new NFA.State("^", 10);
+
+            state_Start.transitions.Add(NFA.TransitionFactory.EqualTo("!", state_Op_Not));
+            state_Start.transitions.Add(NFA.TransitionFactory.EqualTo("~", state_Op_BitNot));
+            state_Start.transitions.Add(NFA.TransitionFactory.EqualTo("^", state_Op_BitXor));
+
+            NFA.State state_Op_Add = new NFA.State("+", 10);
+            NFA.State state_Op_AddOne = new NFA.State("++", 10);
+            NFA.State state_Op_AddSelf = new NFA.State("+=", 10);
+
+            state_Start.transitions.Add(NFA.TransitionFactory.EqualTo("+", state_Op_Add));
+            state_Op_Add.transitions.Add(NFA.TransitionFactory.EqualTo("+", state_Op_AddOne));
+            state_Op_Add.transitions.Add(NFA.TransitionFactory.EqualTo("=", state_Op_AddSelf));
+
+            NFA.State state_Op_Sub = new NFA.State("-", 10);
+            NFA.State state_Op_SubOne = new NFA.State("--", 10);
+            NFA.State state_Op_SubSelf = new NFA.State("-=", 10);
+
+            state_Start.transitions.Add(NFA.TransitionFactory.EqualTo("-", state_Op_Sub));
+            state_Op_Sub.transitions.Add(NFA.TransitionFactory.EqualTo("-", state_Op_SubOne));
+            state_Op_Sub.transitions.Add(NFA.TransitionFactory.EqualTo("=", state_Op_SubSelf));
+
+            NFA.State state_Op_Mul = new NFA.State("*", 10);
+            NFA.State state_Op_MulSelf = new NFA.State("*=", 10);
+
+            state_Start.transitions.Add(NFA.TransitionFactory.EqualTo("*", state_Op_Mul));
+            state_Op_Mul.transitions.Add(NFA.TransitionFactory.EqualTo("=", state_Op_MulSelf));
+
+            NFA.State state_Op_Dev = new NFA.State("/", 10);
+            NFA.State state_Op_DevSelf = new NFA.State("/=", 10);
+
+            state_Start.transitions.Add(NFA.TransitionFactory.EqualTo("/", state_Op_Dev));
+            state_Op_Dev.transitions.Add(NFA.TransitionFactory.EqualTo("=", state_Op_DevSelf));
+
+            NFA.State state_Op_Rem = new NFA.State("%", 10);
+            NFA.State state_Op_RemSelf = new NFA.State("%=", 10);
+
+            state_Start.transitions.Add(NFA.TransitionFactory.EqualTo("%", state_Op_Rem));
+            state_Op_Rem.transitions.Add(NFA.TransitionFactory.EqualTo("=", state_Op_RemSelf));
+
+            state_Start.transitions.Add(NFA.TransitionFactory.EqualTo("(", new NFA.State("(", 50)));
+            state_Start.transitions.Add(NFA.TransitionFactory.EqualTo(")", new NFA.State(")", 50)));
+            state_Start.transitions.Add(NFA.TransitionFactory.EqualTo("[", new NFA.State("[", 50)));
+            state_Start.transitions.Add(NFA.TransitionFactory.EqualTo("]", new NFA.State("]", 50)));
+            state_Start.transitions.Add(NFA.TransitionFactory.EqualTo("{", new NFA.State("{", 50)));
+            state_Start.transitions.Add(NFA.TransitionFactory.EqualTo("}", new NFA.State("}", 50)));
+
+            NFA.State state_Op_Colon = new NFA.State(":", 10);
+            NFA.State state_Op_Namespace = new NFA.State("::", 10);
+
+            state_Start.transitions.Add(NFA.TransitionFactory.EqualTo(":", state_Op_Colon));
+            state_Op_Colon.transitions.Add(NFA.TransitionFactory.EqualTo(":", state_Op_Namespace));
+
+            state_Start.transitions.Add(NFA.TransitionFactory.EqualTo(";", new NFA.State(";", 10)));
+            state_Start.transitions.Add(NFA.TransitionFactory.EqualTo(",", new NFA.State(",", 10)));
+            state_Start.transitions.Add(NFA.TransitionFactory.EqualTo("?", new NFA.State("?", 10)));
+
+            NFA.State state_Op_SQM_S = new NFA.State("'", 10);
+            NFA.State state_Op_SQM_D = new NFA.State("''", -1);
+            NFA.State state_Op_SQM_T = new NFA.State("'''", 10);
+
+            state_Start.transitions.Add(NFA.TransitionFactory.EqualTo("'", state_Op_SQM_S));
+            state_Op_SQM_S.transitions.Add(NFA.TransitionFactory.EqualTo("'", state_Op_SQM_D));
+            state_Op_SQM_D.transitions.Add(NFA.TransitionFactory.EqualTo("'", state_Op_SQM_T));
+
+            NFA.State state_Op_DQM_S = new NFA.State("\"", 10);
+            NFA.State state_Op_DQM_D = new NFA.State("\"\"", -1);
+            NFA.State state_Op_DQM_T = new NFA.State("\"\"\"", 10);
+
+            state_Start.transitions.Add(NFA.TransitionFactory.EqualTo("\"", state_Op_DQM_S));
+            state_Op_DQM_S.transitions.Add(NFA.TransitionFactory.EqualTo("\"", state_Op_DQM_D));
+            state_Op_DQM_D.transitions.Add(NFA.TransitionFactory.EqualTo("\"", state_Op_DQM_T));
+
+            NFA.State state_Op_Dot_S = new NFA.State(".", 10);
+            NFA.State state_Op_Dot_D = new NFA.State("..", -1);
+            NFA.State state_Op_Dot_T = new NFA.State("...", 10);
+
+            state_Start.transitions.Add(NFA.TransitionFactory.EqualTo(".", state_Op_Dot_S));
+            state_Op_Dot_S.transitions.Add(NFA.TransitionFactory.EqualTo(".", state_Op_Dot_D));
+            state_Op_Dot_D.transitions.Add(NFA.TransitionFactory.EqualTo(".", state_Op_Dot_T));
+
             Honey.state_Start = state_Start;
             return new NFA(state_Start);
         }
