@@ -362,6 +362,11 @@ namespace Honey.Core
             state_Op_Dot_S.transitions.Add(NFA.TransitionFactory.EqualTo(".", state_Op_Dot_D));
             state_Op_Dot_D.transitions.Add(NFA.TransitionFactory.EqualTo(".", state_Op_Dot_T));
 
+            NFA.State state_Space = new NFA.State("Space", 10);
+
+            state_Start.transitions.Add(NFA.TransitionFactory.EqualTo(" ", state_Space));
+            state_Space.transitions.Add(NFA.TransitionFactory.EqualTo(" ", state_Space));
+
             Honey.state_Start = state_Start;
             return new NFA(state_Start);
         }

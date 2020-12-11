@@ -18,7 +18,6 @@
 using Honey.Core;
 using System;
 using System.Collections.Generic;
-using System.IO;
 
 namespace Honey.Test
 {
@@ -37,6 +36,9 @@ namespace Honey.Test
             tokens = Lexer.Scan("test.honey",out exceptions);
             foreach(var i in tokens)
                 Console.WriteLine(i.value + " : " + i.type);
+            Console.WriteLine("----------Errors----------");
+            foreach (var i in exceptions)
+                Console.WriteLine(i);
         }
     }
 }

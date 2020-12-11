@@ -59,7 +59,7 @@ namespace Honey.Core
                         } while (nfa.GetRecordCount() > 0 && type == "End");
                         if (type == "End" || type == "Start")
                         {
-                            exceptions.Add(new Exception("bacvccasdf"));
+                            exceptions.Add(new Exception("Unexpected symbol in file " + filePath + " at line " + i + " | position " + j + " | value " + value));
                             j++;
                         }
                         else
@@ -70,7 +70,7 @@ namespace Honey.Core
                     if (j == line.Length - 1)
                     {
                         if (type == "End")
-                            exceptions.Add(new Exception("sjdfklljasdlf0"));
+                            exceptions.Add(new Exception("Unexpected symbol in file " + filePath + " at line " + i + " | position " + j + " | value " + value));
                         else
                             result.Add(new Token(type, value));
                     }
