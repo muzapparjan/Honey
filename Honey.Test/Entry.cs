@@ -17,6 +17,8 @@
 
 using Honey.Core;
 using System;
+using System.Collections.Generic;
+using System.IO;
 
 namespace Honey.Test
 {
@@ -24,25 +26,17 @@ namespace Honey.Test
     {
         private static void Main(string[] args)
         {
-            Console.WriteLine("Welcome to Honey!");
-
-            Console.WriteLine("Please input string to parse:");
-            Console.Write(">>");
-            string rawInput = Console.ReadLine();
-            string[] inputs = rawInput.Split(" ");
-            foreach (var input in inputs)
+            /*if (args.Length == 0)
             {
-                Console.WriteLine("Input : " + input);
-                NFA nfa = Honey.Core.Honey.CreateNFA();
-                foreach (var character in input)
-                    nfa.Input(character.ToString());
-                string type;
-                string value = nfa.GetValue(out type);
-                Console.WriteLine("NFA Value : " + value);
-                Console.WriteLine("NFA Type  : " + type);
-            }
-
-            //List<string> outputs = new List<string>();
+                Console.WriteLine("Where is the script?");
+                return;
+            }*/
+            List<Token> tokens;
+            List<Exception> exceptions;
+            //tokens = Lexer.Scan(args[0], out exceptions);
+            tokens = Lexer.Scan("test.honey",out exceptions);
+            foreach(var i in tokens)
+                Console.WriteLine(i.value + " : " + i.type);
         }
     }
 }

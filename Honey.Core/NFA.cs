@@ -276,6 +276,14 @@ namespace Honey.Core
             type = states[0].type;
             return value;
         }
+        public int GetCurrentStateCount()
+        {
+            return states.Count;
+        }
+        public int GetRecordCount()
+        {
+            return records.Count;
+        }
         public void Return()
         {
             if (records.Count == 0)
